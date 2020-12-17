@@ -34,7 +34,8 @@ finaloutput=foreach(i=folderlist,
 
 stopCluster(cl)
 
-FST=match_sensors(FST,splice_at=c(1001, 1801))
+FSTtest=match_sensors(FST,splice_at=c(1001, 1801))
+FSTnorm=normalize(FSTtest)
 
 #----Initial Sweep for WR Outliers----
 hist(data.frame(FST)$"X450")
@@ -45,7 +46,9 @@ hist(data.frame(FSTr)$"X450")
 
 
 #----Data Exploration----
-plot(FSTr, lwd = 0.25, lty = 1, col = "grey25", main="2019 Fresh and Dry Spectra")
+plot(FST, lwd = 0.25, lty = 1, col = "grey25", main="Raw")
+plot(FSTtest, lwd = 0.25, lty = 1, col = "grey25", main="Jump Correction")
+plot(FSTnorm, lwd = 0.25, lty = 1, col = "grey25", main="Normalize")
 plot_quantile(FSTr, total_prob = 0.95, col = rgb(1, 0, 0, 0.25), border = FALSE, add = TRUE)
 plot_regions(FSTr, regions = default_spec_regions(), add = TRUE)
 plot_interactive(FSTr)
