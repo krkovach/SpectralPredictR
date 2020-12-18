@@ -34,7 +34,7 @@ finaloutput=foreach(i=folderlist,
 
 stopCluster(cl)
 
-FSTjcwithours=match_sensors(FST,splice_at=c(1000, 1800))
+FSTjcours=match_sensors(FST,splice_at=c(1000, 1800))
 # FSTnorm=normalize(FSTjc)
 
 #----Initial Sweep for WR Outliers----
@@ -42,7 +42,7 @@ hist(data.frame(FST)$"X450")
 FSTr=FST[-which(data.frame(FST)$"X450">0.8),]
 FSTr=FSTr[-which(data.frame(FSTr)$"X1000"<0.05),]
 hist(data.frame(FSTr)$"X450")
-write.csv(data.frame(FSTjcwithours),"kdryspecJC.csv",row.names=FALSE)
+write.csv(data.frame(FSTjcours),"kdryspecJCours.csv",row.names=FALSE)
 
 
 #----Data Exploration----

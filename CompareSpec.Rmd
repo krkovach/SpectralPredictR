@@ -10,34 +10,46 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
+require(reshape2)
+require(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 wd="F:/PostDoc/ABoVE"
 ```
 
 ```{r cars,include=FALSE,echo=FALSE}
-tspec=read.csv(paste0(wd,"/tdryspec.csv"),head=T)
-kspec=read.csv(paste0(wd,"/kdryspec.csv"),head=T)
+tspec=read.csv(paste0(wd,"/tdryspec.csv"),head=T,check.names=FALSE)
+kspec=read.csv(paste0(wd,"/kdryspecJCours.csv"),head=T,check.names=FALSE)
 tspec=tspec[order(tspec$sample_name),]
 kspec=kspec[order(kspec$sample_name),]
 summary(tspec$sample_name==kspec$sample_name)
-tspec=tspec[,-1]
-kspec=kspec[,-1]
 ```
 
 ```{r pressure, echo=FALSE}
-newspec=abs(tspec-kspec)
+newspec=tspec[,-1]-kspec[,-1]
+newspec=abs(newspec)
 means=colMeans(newspec)
-plot(means)
+plot(means,xaxt = "n",xlab="band",ylab="MAD (% ref)",main="SpecDAL vs Spectrolab extracted and jump corrected spectra (using ABoVE 2019 dry spectra)")
+axis(1, at=seq(150, 2151, by=500), labels=seq(500,2500, by=500))
 ```
 
 ## Plots
 
 ```{r}
-oFST=FST[3555,]
-oFSTjc=FSTjc[3555,]
-oFSTjcwithours=FSTjcwithours[3555,]
+tspec_sub=tspec[3555,]
+tspec_sub$sample_name="SpecDAL"
+kspec_sub=kspec[3555,]
+kspec_sub$sample_name="Spectrolab"
+combspec=rbind(tspec_sub,kspec_sub)
+finalspec=melt(combspec, id.vars=c("sample_name"))
 
-plot(oFST, lwd = 0.25, lty = 1, col = "grey25", main="CHAR_021_DRIN_00000 Spectra")
-plot(oFSTjc, lwd = 0.25, lty = 1, col = "red",add=T)
-plot(oFSTjcwithours, lwd = 0.25, lty = 1, col = "blue",add=T)
+ggplot(finalspec, aes(x=as.numeric(variable), y=value, color=sample_name))+
+  geom_line()+
+  ggtitle("CHAR_021_DRIN_00000 Spectra")+
+  ylab("value")+
+  labs(color='Method')+
+  theme_bw()+
+  scale_x_continuous(name="band",
+                     limits=c(0, 2151),
+                     breaks=seq(150, 2151,by=500),
+                     labels=seq(500,2500, by=500))
 ```
