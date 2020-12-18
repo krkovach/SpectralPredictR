@@ -13,11 +13,11 @@ require(spectrolab)
 set.seed(112345)
 cores=detectCores()-1
 
-enspecdrive="Z:/townsenduser-rw/projects/ABoVE/ground_data/2019/dry_data/dry_spec"
+enspecdrive="Z:/townsenduser-rw/projects/NEON/ground_data/2020/fresh_data"
 
 #----Import Spectra----
 folderlist=unique(sub("/[^/]+$","",list.files(path=enspecdrive,
-                                              pattern='.asd$',
+                                              pattern='.sig$',
                                               recursive=TRUE,
                                               full.names = TRUE)))
 
