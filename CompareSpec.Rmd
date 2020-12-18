@@ -1,0 +1,43 @@
+---
+title: "SpecDAL WF vs Spectrolab WF"
+author: "Kyle Kovach"
+date: "12/17/2020"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+wd="F:/PostDoc/ABoVE"
+```
+
+```{r cars,include=FALSE,echo=FALSE}
+tspec=read.csv(paste0(wd,"/tdryspec.csv"),head=T)
+kspec=read.csv(paste0(wd,"/kdryspec.csv"),head=T)
+tspec=tspec[order(tspec$sample_name),]
+kspec=kspec[order(kspec$sample_name),]
+summary(tspec$sample_name==kspec$sample_name)
+tspec=tspec[,-1]
+kspec=kspec[,-1]
+```
+
+```{r pressure, echo=FALSE}
+newspec=abs(tspec-kspec)
+means=colMeans(newspec)
+plot(means)
+```
+
+## Plots
+
+```{r}
+oFST=FST[3555,]
+oFSTjc=FSTjc[3555,]
+oFSTjcwithours=FSTjcwithours[3555,]
+
+plot(oFST, lwd = 0.25, lty = 1, col = "grey25", main="CHAR_021_DRIN_00000 Spectra")
+plot(oFSTjc, lwd = 0.25, lty = 1, col = "red",add=T)
+plot(oFSTjcwithours, lwd = 0.25, lty = 1, col = "blue",add=T)
+```
