@@ -3,8 +3,8 @@ title: "SpecDAL WF vs Spectrolab WF"
 author: "Kyle Kovach"
 date: "12/17/2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 editor_options:
   chunk_output_type: console
 ---
@@ -13,7 +13,7 @@ editor_options:
 require(reshape2)
 require(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
-wd="F:/PostDoc/ABoVE"
+wd="C:/Users/kylek/Google Drive/PostDoc/FieldSpec_SpecEvo/Testing Datasets"
 ```
 
 ```{r cars,include=FALSE,echo=FALSE}
