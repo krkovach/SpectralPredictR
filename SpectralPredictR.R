@@ -6,7 +6,7 @@
 # install.packages("doParallel")
 # install.packages("spectrolab")
 # install.packages("dplyr")
-# install.packages("")
+# install.packages("tidyr")
 
 require(doParallel)
 require(spectrolab)
@@ -41,15 +41,17 @@ for (j in c("asd","sed","sig"))
                         .packages=c('spectrolab'))%dopar%
       {
         spectra=read_spectra(path=i,format=j)
-        data.frame(spectra,folder=i,format=j,check.names=FALSE)->sedadjust
-        if (j=="sed"){
+        if (j=="asd"|j=="sig"){
+          data.frame(spectra,folder=i,format=j,check.names=FALSE)
+        } else if (j=="sed"){
+          sedadjust=data.frame(spectra,folder=i,format=j,check.names=FALSE)
           sedadjustT=sedadjust[,3:ncol(sedadjust)]
           sedadjustH=sedadjust[,1:2]
           seqcol=seq(from=1,to=2150,by=2)
           sedadjustTe=sedadjustT[,seqcol]/100
           sedadjustTo=sedadjustT[,-seqcol]
           sedadjustF=cbind(sedadjustH,sedadjustTe,sedadjustTo)
-          TestOutput=sedadjustF[,names(sedadjust)]
+          sedadjustF[,names(sedadjust)]
         }
       };FST=as_spectra(finaloutput[,1:2152],name_idx=1)
     
@@ -94,11 +96,11 @@ sampledata_VN=sampledata_5nm
 
 #----Predict Traits----
 
-modeldirectory=list.files(path=choose.dir(),
+modeldirectory=list.files(path=choose.dir(default="",
+                                          caption="Please select main folder containing either fresh or dry models (based on spectra being processed)."),
                           pattern=".csv$",
                           recursive=FALSE,
-                          full.names = TRUE,
-                          caption="Please select main folder containing either fresh or dry models (based on spectra being processed).")
+                          full.names = TRUE)
 
 cl=makeCluster(cores);registerDoParallel(cl);finished_output=foreach(model=modeldirectory,
                                                                      .combine=rbind)%dopar%
