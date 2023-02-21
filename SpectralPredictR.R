@@ -76,8 +76,6 @@ FST_n=data.frame(FSTfinal_norm);FST_n=cbind(RT,FSTfinal_norm)
 headcount=ncol(FST_f)-2151
 specstart=headcount+1
 
-sampledata=FST_f
-
 cl=makeCluster(cores);registerDoParallel(cl);sampledata_VN=foreach(i=1:nrow(FST_f),
                                                                    .combine=rbind)%dopar%
   {
@@ -89,6 +87,8 @@ cl=makeCluster(cores);registerDoParallel(cl);sampledata_VN=foreach(i=1:nrow(FST_
     cbind(e,f)
   }
 stopCluster(cl)
+
+sampledata=sampledata_VN
 
 sampledata_wav=sampledata[,-c(1:headcount)]
 sampledata_head=sampledata[,c(1:headcount)]
