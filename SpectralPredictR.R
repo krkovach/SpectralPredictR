@@ -76,6 +76,8 @@ FST_n=data.frame(FSTfinal_norm);FST_n=cbind(RT,FSTfinal_norm)
 headcount=ncol(FST_f)-2151
 specstart=headcount+1
 
+sampledata=FST_f
+
 cl=makeCluster(cores);registerDoParallel(cl);sampledata_VN=foreach(i=1:nrow(FST_f),
                                                                    .combine=rbind)%dopar%
   {
@@ -88,11 +90,11 @@ cl=makeCluster(cores);registerDoParallel(cl);sampledata_VN=foreach(i=1:nrow(FST_
   }
 stopCluster(cl)
 
-sampledata_wav=sampledata_VN[,-c(1:headcount)]
-sampledata_head=sampledata_VN[,c(1:headcount)]
+sampledata_wav=sampledata[,-c(1:headcount)]
+sampledata_head=sampledata[,c(1:headcount)]
 sampledata_5nm_wav=sampledata_wav[,seq_len(ncol(sampledata_wav)) %% 5 == 1]
 sampledata_5nm=cbind(sampledata_head,sampledata_5nm_wav)
-sampledata_VN=sampledata_5nm
+sampledata=sampledata_5nm
 
 #----Predict Traits----
 
@@ -107,15 +109,15 @@ cl=makeCluster(cores);registerDoParallel(cl);finished_output=foreach(model=model
   {
     modelname=split_path(model)[1]
     modelcoeffs_mat=data.matrix(read.csv(model, header = TRUE, row.names = 1,sep = ","))
-    sampledata_VN_tail=sampledata_VN[,-c(1:headcount)]
-    sampledata_VN_head=sampledata_VN[,c(1:headcount)]
-    sampledata_VN_tail$constant=1
-    sampledata_VN_tail=cbind(intercept=sampledata_VN_tail[,ncol(sampledata_VN_tail)],sampledata_VN_tail[,c(1:ncol(sampledata_VN_tail)-1)])
-    sampledata_VN_tail_mat=as.matrix(sampledata_VN_tail)
-    modeloutput=sampledata_VN_tail_mat %*% t(modelcoeffs_mat)
-    modeloutput_bind=cbind(sampledata_VN_head,as.data.frame(modeloutput))
+    sampledata_tail=sampledata[,-c(1:headcount)]
+    sampledata_head=sampledata[,c(1:headcount)]
+    sampledata_tail$constant=1
+    sampledata_tail=cbind(intercept=sampledata_tail[,ncol(sampledata_tail)],sampledata_tail[,c(1:ncol(sampledata_tail)-1)])
+    sampledata_tail_mat=as.matrix(sampledata_tail)
+    modeloutput=sampledata_tail_mat %*% t(modelcoeffs_mat)
+    modeloutput_bind=cbind(sampledata_head,as.data.frame(modeloutput))
     data.frame(modelname=modelname,
-               sampledata_VN_head,
+               sampledata_head,
                t_mean=rowMeans(modeloutput),
                t_std=apply(modeloutput,1,sd),
                as.data.frame(modeloutput),
