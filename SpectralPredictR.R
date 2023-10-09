@@ -24,7 +24,6 @@ split_path=function(path) {
   return(c(basename(path),split_path(dirname(path))))
 }
 
-#----Import Spectra----
 for (j in c("asd","sed","sig"))
 {
   if (exists('finaloutput')){rm(finaloutput)}
@@ -41,19 +40,8 @@ for (j in c("asd","sed","sig"))
                         .packages=c('spectrolab'))%dopar%
       {
         spectra=read_spectra(path=i,format=j)
-        if (j=="asd"|j=="sig"){
-          data.frame(spectra,folder=i,format=j,check.names=FALSE)
-        } else if (j=="sed"){
-          sedadjust=data.frame(spectra,folder=i,format=j,check.names=FALSE)
-          sedadjustT=sedadjust[,3:ncol(sedadjust)]
-          sedadjustH=sedadjust[,1:2]
-          seqcol=seq(from=1,to=2150,by=2)
-          sedadjustTe=sedadjustT[,seqcol]/100
-          sedadjustTo=sedadjustT[,-seqcol]
-          sedadjustF=cbind(sedadjustH,sedadjustTe,sedadjustTo)
-          sedadjustF[,names(sedadjust)]
-        }
-      };FST=as_spectra(finaloutput[,1:2152],name_idx=1)
+        data.frame(spectra,folder=i,format=j,check.names=FALSE)
+        };FST=as_spectra(finaloutput[,1:2152],name_idx=1)
     
     stopCluster(cl)
     
@@ -65,14 +53,13 @@ for (j in c("asd","sed","sig"))
       )
     };FSTdf=data.frame(FST,check.names=FALSE)
     if (!exists('FFO')){FFO=FSTdf[0,]}
-    if (!exists('RT')){RT=finaloutput[0,c(1,2153:2154)]}
-    FFO=rbind(FFO,FSTdf);RT=rbind(RT,finaloutput[,c(1,2153:2154)])
+    FFO=rbind(FFO,FSTdf)
   }};FSTfinal=as_spectra(FFO,name_idx=1);FSTfinal_norm=normalize(FSTfinal)
 
-FST_f=data.frame(FSTfinal);FST_f=cbind(RT,FSTfinal)
-FST_n=data.frame(FSTfinal_norm);FST_n=cbind(RT,FSTfinal_norm)
+FST_f=data.frame(FSTfinal)
+FST_n=data.frame(FSTfinal_norm)
 
-#----Process Spectra and Vector Normalize----
+#----Process Spectra, Vector Normalize, and Resample----
 headcount=ncol(FST_f)-2151
 specstart=headcount+1
 
@@ -82,9 +69,9 @@ cl=makeCluster(cores);registerDoParallel(cl);sampledata_VN=foreach(i=1:nrow(FST_
     a=FST_f[i,]
     b=sqrt(rowSums(a[,specstart:ncol(a)]^2))
     d=a[,-c(1:headcount)]
-    e=a[,c(1:headcount)]
+    sample_name=a[,c(1:headcount)]
     f=d/b
-    cbind(e,f)
+    cbind(sample_name,f)
   }
 stopCluster(cl)
 
