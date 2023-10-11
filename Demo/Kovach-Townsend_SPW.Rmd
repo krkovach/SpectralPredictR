@@ -268,7 +268,7 @@ predspread=pivot_wider(data=predsub,id_cols=sample_name,names_from=modelname,val
 predunlist=as.data.frame(unnest(predspread))
 colnames(predunlist)=sub(".csv", "", colnames(predunlist))
 # write.csv(predunlist,"SpectroPredictR_finished_model_output.csv",row.names=FALSE)
-predunlist[1:4]
+predunlist[1:4,]
 
 ```
 
