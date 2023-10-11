@@ -283,7 +283,7 @@ for (i in unique(predplot$modelname)){
   d=ggplot(datanow,
            aes(x=Group,y=t_mean))+
     ggtitle(paste0(file_path_sans_ext(i)," (Fresh Samples) [n=",nrow(datanow),"]"))+
-    geom_boxplot(color="blue",size=1)+
+    geom_boxplot(color="black",fill="lightblue",size=1)+
     coord_flip()+
     xlab("Sample")+
     ylab("Mean of Predictions")+
@@ -294,7 +294,7 @@ for (i in unique(predplot$modelname)){
   e=ggplot(datanow,
            aes(x=Group,y=t_std,))+
     ggtitle("    ")+
-    geom_boxplot(color="yellow",size=1)+
+    geom_boxplot(color="black",fill="yellow",size=1)+
     ylab("StDev of Predictions")+
     scale_color_brewer(palette="Set1")+
     coord_flip()+
