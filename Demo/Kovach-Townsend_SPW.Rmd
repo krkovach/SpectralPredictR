@@ -71,7 +71,7 @@ The following code parallel processes the spectral files to import them from the
 - raw spectra
 - jump corrected
 - jump corrected and unit vector normalized
-- jump corrected, unit vector normalized, and ) will be available, though the model application will be with the vector normalized data (as the models were built using vector normalized data).
+- jump corrected, unit vector normalized, and resampled to 5nm will be available, though the model application will be with the vector normalized data (as the models were built using vector normalized data).
 
 ```{r Import Spectra,message=F}
 
@@ -140,8 +140,8 @@ head(sampledata)[c(1,82:92)] #Vector Normalized Resampled Spectra
 
 ```
 
-## Plots
-Following are some methods to plot the data you've extracted.
+## Plots and Outlier Detection
+Following are some methods to plot the data you've extracted.  Some are built using the Spectrolab package, while others are written from existing R code.  Using individual wavelengths is a good way to quickly assess if there are any significant outliers that should be removed.
 
 ```{r Plots}
 
@@ -190,9 +190,9 @@ FST_f[maxmax,1]
 ```
 
 ## Grouped Outlier Detection
-This is a grouped manual outlier detection for samples with replicates.  It vector normalizes the spectra, and uses a sample and replicate value (extracted in this case from the file nomenclature) to display them separately dd
+This is a grouped manual outlier detection for samples with replicates.  It vector normalizes the spectra, and uses a sample and replicate value (extracted in this case from the file nomenclature) to display them separately.
 
-```{r Grouped Outlier Detection,message=F}
+```{r Grouped Outlier Detection, warnings=F,message=F}
 
 sample_data_plot=FST_f
 
@@ -226,6 +226,7 @@ tic=0;for (i in unique(sample_data_plot_sub$Sample)){
 
 
 ## Predict Traits
+This code block will predict traits using the models specified in the folder at the beginning of the script.  It will iterate over all the models in that folder with all the spectra extracted above.  Output here is a table with the sample name as the first column, and all additional columns being the traits predicted, and the uncertainties associated with them.
 
 ```{r Predict Traits, warnings=F}
 
@@ -273,8 +274,9 @@ predunlist[1:4,]
 ```
 
 ## Plot Traits
+To better visualize trait distributions, this script will produce box plots with a "grouping" based on the sample name.  It plots both the mean trait for that group, and the uncertainties associated with it.  The group can be redifined to any column that uniquely defines the data.  An example would be growth form.
 
-```{r}
+```{r Plot Traits}
 ##### Plot Boxplots #####
 for (i in unique(predplot$modelname)){
 
