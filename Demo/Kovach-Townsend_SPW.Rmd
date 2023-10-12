@@ -1,7 +1,7 @@
 ---
 title: "Kovach-Townsend Spectral Processing Workflow"
 output: html_document
-date: "2023-10-04"
+date: "2023-10-12"
 editor_options: 
   chunk_output_type: console
 runtime: shiny
@@ -41,6 +41,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # install.packages("stringr",repos = "http://cran.us.r-project.org")
 # install.packages("tools",repos = "http://cran.us.r-project.org")
 # install.packages("cowplot",repos = "http://cran.us.r-project.org")
+# install.packages("GGally",repos = "http://cran.us.r-project.org")
 
 require(doParallel)
 require(spectrolab)
@@ -51,6 +52,7 @@ require(cowplot)
 require(reshape2)
 require(stringr)
 require(tools)
+require(GGally)
 
 set.seed(112345)
 cores=detectCores()-1
@@ -187,6 +189,9 @@ maxmax=which.max(FST_f$X550)
 max(FST_f$X550,na.rm=T)
 FST_f[maxmax,1]
 
+# #Correlation Plot
+# ggcorr(sampledata[c(-1)])
+
 ```
 
 ## Grouped Outlier Detection
@@ -274,7 +279,7 @@ predunlist[1:4,]
 ```
 
 ## Plot Traits
-To better visualize trait distributions, this script will produce box plots with a "grouping" based on the sample name.  It plots both the mean trait for that group, and the uncertainties associated with it.  The group can be redifined to any column that uniquely defines the data.  An example would be growth form.
+To better visualize trait distributions, this script will produce box plots with a "grouping" based on the sample name.  It plots both the mean trait for that group, and the uncertainties associated with it.  The group can be redifined to any column that uniquely defines the data.  An example would be grouping by growth form which would give us the distribution over that entire group.
 
 ```{r Plot Traits}
 ##### Plot Boxplots #####
@@ -285,7 +290,7 @@ for (i in unique(predplot$modelname)){
   d=ggplot(datanow,
            aes(x=Group,y=t_mean))+
     ggtitle(paste0(file_path_sans_ext(i)," (Fresh Samples) [n=",nrow(datanow),"]"))+
-    geom_boxplot(color="black",fill="lightblue",size=1)+
+    geom_boxplot(color="blue",fill="lightblue",size=0.5)+
     coord_flip()+
     xlab("Sample")+
     ylab("Mean of Predictions")+
@@ -296,7 +301,7 @@ for (i in unique(predplot$modelname)){
   e=ggplot(datanow,
            aes(x=Group,y=t_std,))+
     ggtitle("    ")+
-    geom_boxplot(color="black",fill="yellow",size=1)+
+    geom_boxplot(color="black",fill="yellow",size=0.5)+
     ylab("StDev of Predictions")+
     scale_color_brewer(palette="Set1")+
     coord_flip()+
