@@ -14,7 +14,7 @@ This script will recurse through a folder and all subfolders to select all spect
 
 ```{r Define Folders}
 
-specfolder="/Users/kylekovach/Library/CloudStorage/GoogleDrive-me@kylekovach.com/My Drive/Conferences and Presentations/BioScape/Workshop/Spectra_Test"
+specfolder="Demo/Spectra_Test"
 
 ```
 
@@ -23,7 +23,7 @@ If applying partial least squares regression models (PLSR) to predict traits on 
 
 ```{r Define Models}
 
-specmodelpath="/Users/kylekovach/Library/CloudStorage/GoogleDrive-me@kylekovach.com/My Drive/Conferences and Presentations/BioScape/Workshop/Models/models_ASD_fresh_spectra"
+specmodelpath="Models/models_ASD_fresh_spectra"
 
 ```
 
