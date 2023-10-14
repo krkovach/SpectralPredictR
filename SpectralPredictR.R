@@ -59,6 +59,9 @@ for (j in c("asd","sed","sig"))
 FST_f=data.frame(FSTfinal)
 FST_n=data.frame(FSTfinal_norm)
 
+write.csv(FST_f,"SpectralPredictR_raw_spectra.csv",row.names=FALSE)
+write.csv(FST_n,"SpectralPredictR_VN_jumpcorrected_spectra.csv",row.names=FALSE)
+
 #----Process Spectra, Vector Normalize, and Resample----
 headcount=ncol(FST_f)-2151
 specstart=headcount+1
@@ -82,6 +85,7 @@ sampledata_head=sampledata[,c(1:headcount)]
 sampledata_5nm_wav=sampledata_wav[,seq_len(ncol(sampledata_wav)) %% 5 == 1]
 sampledata_5nm=cbind(sampledata_head,sampledata_5nm_wav)
 sampledata=sampledata_5nm
+write.csv(sampledata,"SpectralPredictR_5nmresampled_spectra.csv",row.names=FALSE)
 
 #----Predict Traits----
 
@@ -116,4 +120,4 @@ predsub=finished_output[,c(1:2,6:7)]
 predspread=pivot_wider(data=predsub,id_cols=sample_name,names_from=modelname,values_from=c("t_mean","t_std"))
 predunlist=as.data.frame(unnest(predspread))
 colnames(predunlist)=sub(".csv", "", colnames(predunlist))
-write.csv(predunlist,"SpectroPredictR_finished_model_output.csv",row.names=FALSE)
+write.csv(predunlist,"SpectralPredictR_trait_output.csv",row.names=FALSE)
