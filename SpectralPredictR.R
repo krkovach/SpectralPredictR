@@ -1,5 +1,5 @@
 #Kyle R Kovach
-#SpectroPredictR
+#SpectralPredictR
 #December 1, 2020
 
 #----Load Libraries----
