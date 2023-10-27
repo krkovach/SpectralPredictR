@@ -151,7 +151,7 @@ plot_interactive(FSTfinal,
                  colpalette = function(n) RColorBrewer::brewer.pal(n, "Dark2"),
 )
 
-plot(FSTfinal, ylab = "value", xlab = "band", lty = 1, type = "l")
+plot(FSTfinal, ylab = "Reflectance %", xlab = "Wavelength (nm)", lty = 1, type = "l")
 
 plot_regions(
       FSTfinal,
@@ -163,7 +163,7 @@ plot_regions(
       cex_label = 1,
 )
 
-plot(FSTfinal_norm, ylab = "value", xlab = "band", lty = 1, type = "l")
+plot(FSTfinal_norm, ylab = "Vector Normalized Reflectance %", xlab = "Wavelength (nm)", lty = 1, type = "l")
 
 plot_regions(
       FSTfinal,
