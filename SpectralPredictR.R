@@ -52,7 +52,7 @@ for (j in c("asd","sed","sig"))
         splice_at=splice_val
       )
     }
-    if (j=="asd"){
+    if (j=="sig"){
       splice_val=c(990,1900)
       FST=match_sensors(
         FST,
