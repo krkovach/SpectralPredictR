@@ -46,17 +46,15 @@ for (j in c("asd","sed","sig"))
     stopCluster(cl)
     
     if (j=="asd"){
-      splice_val=c(1001,1801)
       FST=match_sensors(
         FST,
-        splice_at=splice_val
+        splice_at=c(1001,1801)
       )
     }
     if (j=="sig"){
-      splice_val=c(990,1900)
       FST=match_sensors(
         FST,
-        splice_at=splice_val
+        splice_at=c(990,1900)
       )
     };FSTdf=data.frame(FST,check.names=FALSE)
     if (!exists('FFO')){FFO=FSTdf[0,]}
