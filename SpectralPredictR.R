@@ -46,7 +46,7 @@ for (j in c("asd","sed","sig"))
     stopCluster(cl)
     
     if (j=="asd"||j=="sig"){
-      splice_val=ifelse(j=="asd",c(1000, 1800),c(990, 1900))
+      splice_val=ifelse(j=="asd",c(1001, 1801),c(990, 1900))
       FST=match_sensors(
         FST,
         splice_at=splice_val
