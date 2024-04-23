@@ -68,7 +68,7 @@ write.csv(FST_f,"SpectralPredictR_raw_spectra.csv",row.names=FALSE)
 write.csv(FST_n,"SpectralPredictR_VN_jumpcorrected_spectra.csv",row.names=FALSE)
 
 #----Process Spectra, Vector Normalize, and Resample----
-## This assumes all metadata exists only as the left side columns, and that the spectral dataset in consistant and ends the columns.
+## This assumes all metadata exists only as the left side columns, and that the spectral dataset is consistant and ends the columns.
 headcount=ncol(FST_f)-2151
 specstart=headcount+1
 
