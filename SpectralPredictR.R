@@ -94,7 +94,7 @@ sampledata=sampledata_5nm
 write.csv(sampledata,"SpectralPredictR_5nmresampled_spectra.csv",row.names=FALSE)
 
 #----Predict Traits----
-
+# Choose model directory
 modeldirectory=list.files(path=choose.dir(default="",
                                           caption="Please select main folder containing either fresh or dry models (based on spectra being processed)."),
                           pattern=".csv$",
