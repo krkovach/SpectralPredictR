@@ -13,6 +13,63 @@ require(spectrolab)
 require(dplyr)
 require(tidyr)
 
+#----Load Jump Correct Function----
+jump_correct_specdal = function(spec_df, splices, reference=2, method="additive") {
+  corrected = spec_df
+  for (row_idx in seq_len(nrow(spec_df))) {
+    series = spec_df[row_idx, ]
+    get_sequence_num = function(w) {
+      for (i in seq_along(splices)) if (as.numeric(w) <= splices[i]) return(i)
+      return(length(splices) + 1)
+    }
+    groups = split(series, sapply(as.numeric(names(series)), get_sequence_num))
+    translate_y = function(ref, mov, right=TRUE) {
+      if (method == "additive") {
+        diff = if (right) ref[length(ref)] - mov[1] else ref[1] - mov[length(mov)]
+        return(mov + diff)
+      } else if (method == "multiplicative") {
+        ratio = if (right) ref[length(ref)] / mov[1] else ref[1] / mov[length(mov)]
+        return(mov * ratio)
+      } else {
+        stop("Unknown method: use 'additive' or 'multiplicative'")
+      }
+    }
+    for (i in reference:(length(groups) - 1)) {
+      groups[[i + 1]] = translate_y(groups[[i]], groups[[i + 1]], TRUE)
+    }
+    for (i in seq(reference, 2, by = -1)) {
+      groups[[i - 1]] = translate_y(groups[[i]], groups[[i - 1]], FALSE)
+    }
+    corrected[row_idx, ] = unlist(groups)
+  }
+  corrected
+}
+
+apply_jump_correction = function(spec, instrument, splices = NULL, method = "additive") {
+  # Instrument is passed directly from the loop (j)
+  instrument = tolower(instrument)
+  if (instrument == "sed") {
+    message("No jump correction needed for ", toupper(instrument), ".")
+    return(spec)
+  }
+  # Auto-select splices if not provided
+  if (is.null(splices)) {
+    if (instrument == "asd") splices = c(1001, 1801)
+    if (instrument == "sig") splices = c(990, 1900)
+  }
+  message(sprintf("%s: %s jump correction.", toupper(instrument), method))
+  spec_df = as.data.frame(spec)
+  meta_cols = 1
+  corrected = jump_correct_specdal(
+    spec_df[, -(1:meta_cols)],
+    splices = splices,
+    reference = 2,
+    method = method
+  )
+  spec_df = cbind(spec_df[, 1:meta_cols, drop = FALSE], corrected)
+  as_spectra(spec_df, name_idx = 1)
+}
+
 #----Initialize----
 set.seed(112345)
 cores=detectCores()-1
@@ -45,18 +102,12 @@ for (j in c("asd","sed","sig"))
     
     stopCluster(cl)
     
-    if (j=="asd"){
-      FST=match_sensors(
-        FST,
-        splice_at=c(1001,1801)
-      )
-    }
-    if (j=="sig"){
-      FST=match_sensors(
-        FST,
-        splice_at=c(990,1900)
-      )
-    };FSTdf=data.frame(FST,check.names=FALSE)
+if (j=="asd") {
+  FST = apply_jump_correction(FST, instrument="ASD")
+}
+if (j=="sig") {
+  FST = apply_jump_correction(FST, instrument="SVC")
+};FSTdf=data.frame(FST,check.names=FALSE)
     if (!exists('FFO')){FFO=FSTdf[0,]}
     FFO=rbind(FFO,FSTdf)
   }};FSTfinal=as_spectra(FFO,name_idx=1);FSTfinal_norm=normalize(FSTfinal)
