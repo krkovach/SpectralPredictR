@@ -47,7 +47,7 @@ apply_jump_correction = function(spec, instrument, splices=NULL, method="additiv
   instrument = tolower(instrument)
   # Auto-select splices if not provided
   if (is.null(splices)) {
-    if (instrument == "asd") splices = c(1001, 1801)
+    if (instrument == "asd") splices = c(1000, 1800)
     if (instrument == "sig") splices = c(990, 1900)
   }
   message(sprintf("%s: %s jump correction.", toupper(instrument), method))
