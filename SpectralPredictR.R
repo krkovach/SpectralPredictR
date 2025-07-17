@@ -30,8 +30,6 @@ jump_correct_specdal = function(spec_df, splices, reference=2, method="additive"
       } else if (method == "multiplicative") {
         ratio = if (right) ref[length(ref)] / mov[1] else ref[1] / mov[length(mov)]
         return(mov * ratio)
-      } else {
-        stop("Unknown method: use 'additive' or 'multiplicative'")
       }
     }
     for (i in reference:(length(groups) - 1)) {
@@ -45,13 +43,8 @@ jump_correct_specdal = function(spec_df, splices, reference=2, method="additive"
   corrected
 }
 
-apply_jump_correction = function(spec, instrument, splices = NULL, method = "additive") {
-  # Instrument is passed directly from the loop (j)
+apply_jump_correction = function(spec, instrument, splices=NULL, method="additive") {
   instrument = tolower(instrument)
-  if (instrument == "sed") {
-    message("No jump correction needed for ", toupper(instrument), ".")
-    return(spec)
-  }
   # Auto-select splices if not provided
   if (is.null(splices)) {
     if (instrument == "asd") splices = c(1001, 1801)
@@ -62,12 +55,12 @@ apply_jump_correction = function(spec, instrument, splices = NULL, method = "add
   meta_cols = 1
   corrected = jump_correct_specdal(
     spec_df[, -(1:meta_cols)],
-    splices = splices,
-    reference = 2,
-    method = method
+    splices=splices,
+    reference=2,
+    method=method
   )
-  spec_df = cbind(spec_df[, 1:meta_cols, drop = FALSE], corrected)
-  as_spectra(spec_df, name_idx = 1)
+  spec_df = cbind(spec_df[, 1:meta_cols, drop=FALSE], corrected)
+  as_spectra(spec_df, name_idx=1)
 }
 
 #----Initialize----
