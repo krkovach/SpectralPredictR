@@ -17,12 +17,15 @@ require(tidyr)
 jump_correct_specdal = function(spec_df, splices, reference=2, method="additive") {
   corrected = spec_df
   for (row_idx in seq_len(nrow(spec_df))) {
-    series = spec_df[row_idx, ]
+    series = as.numeric(spec_df[row_idx, ])
+    names(series) = colnames(spec_df)
+    wavelengths = as.numeric(names(series))
+    if (any(is.na(wavelengths))) stop("Non-numeric column names in spectra.")
     get_sequence_num = function(w) {
-      for (i in seq_along(splices)) if (as.numeric(w) <= splices[i]) return(i)
+      for (i in seq_along(splices)) if (w <= splices[i]) return(i)
       return(length(splices) + 1)
     }
-    groups = split(series, sapply(as.numeric(names(series)), get_sequence_num))
+    groups = split(series, sapply(wavelengths, get_sequence_num))
     translate_y = function(ref, mov, right=TRUE) {
       if (method == "additive") {
         diff = if (right) ref[length(ref)] - mov[1] else ref[1] - mov[length(mov)]
@@ -30,6 +33,8 @@ jump_correct_specdal = function(spec_df, splices, reference=2, method="additive"
       } else if (method == "multiplicative") {
         ratio = if (right) ref[length(ref)] / mov[1] else ref[1] / mov[length(mov)]
         return(mov * ratio)
+      } else {
+        stop("Unknown method.")
       }
     }
     for (i in reference:(length(groups) - 1)) {
@@ -45,29 +50,33 @@ jump_correct_specdal = function(spec_df, splices, reference=2, method="additive"
 
 apply_jump_correction = function(spec, instrument, splices=NULL, method="additive") {
   instrument = tolower(instrument)
-  # Auto-select splices if not provided
   if (is.null(splices)) {
     if (instrument == "asd") splices = c(1000, 1800)
     if (instrument == "sig") splices = c(990, 1900)
   }
   message(sprintf("%s: %s jump correction.", toupper(instrument), method))
   spec_df = as.data.frame(spec)
-  meta_cols = 1
+  meta_cols = 3
+  meta = spec_df[, 1:meta_cols, drop=FALSE]
+  spectra = spec_df[, -(1:meta_cols)]
   corrected = jump_correct_specdal(
-    spec_df[, -(1:meta_cols)],
+    spectra,
     splices=splices,
     reference=2,
     method=method
   )
-  spec_df = cbind(spec_df[, 1:meta_cols, drop=FALSE], corrected)
-  as_spectra(spec_df, name_idx=1)
+  cbind(meta, corrected)
 }
 
 #----Initialize----
 set.seed(112345)
 cores=detectCores()-1
 
-specfolder=choose.dir(default="",caption="Please select main folder containing subdirectories of spectral files.")
+##### Define Spectral Folder Path #####
+
+specfolder=""
+
+#######################################
 
 split_path=function(path) {
   if (dirname(path) %in% c("_", path)) return(basename(path))
@@ -91,25 +100,21 @@ for (j in c("asd","sed","sig"))
       {
         spectra=read_spectra(path=i,format=j)
         data.frame(spectra,folder=i,format=j,check.names=FALSE)
-        };FST=as_spectra(finaloutput[,1:2152],name_idx=1)
+        };FST=finaloutput;FST=FST[,c(1,ncol(FST),(ncol(FST)-1),2:(ncol(FST)-2))]
     
     stopCluster(cl)
     
 if (j=="asd") {
-  FST = apply_jump_correction(FST, instrument="ASD")
+  FSTjc = apply_jump_correction(FST, instrument="ASD")
 }
 if (j=="sig") {
-  FST = apply_jump_correction(FST, instrument="SVC")
-};FSTdf=data.frame(FST,check.names=FALSE)
+  FSTjc = apply_jump_correction(FST, instrument="SVC")
+};FSTdf=FSTjc
     if (!exists('FFO')){FFO=FSTdf[0,]}
     FFO=rbind(FFO,FSTdf)
-  }};FSTfinal=as_spectra(FFO,name_idx=1);FSTfinal_norm=normalize(FSTfinal)
+  }};FST_f=FFO
 
-FST_f=data.frame(FSTfinal)
-FST_n=data.frame(FSTfinal_norm)
-
-write.csv(FST_f,"SpectralPredictR_raw_spectra.csv",row.names=FALSE)
-write.csv(FST_n,"SpectralPredictR_VN_jumpcorrected_spectra.csv",row.names=FALSE)
+write.csv(FST_f,"SpectralPredictR_jump_corrected_spectra.csv",row.names=FALSE)
 
 #----Process Spectra, Vector Normalize, and Resample----
 ## This assumes all metadata exists only as the left side columns, and that the spectral dataset is consistant and ends the columns.
@@ -128,6 +133,7 @@ cl=makeCluster(cores);registerDoParallel(cl);sampledata_VN=foreach(i=1:nrow(FST_
   }
 stopCluster(cl)
 
+write.csv(sampledata_VN,"SpectralPredictR_jump_corrected_spectra_VN.csv",row.names=FALSE)
 sampledata=sampledata_VN
 
 sampledata_wav=sampledata[,-c(1:headcount)]
