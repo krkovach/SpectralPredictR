@@ -171,9 +171,10 @@ cl=makeCluster(cores);registerDoParallel(cl);finished_output=foreach(model=model
                check.names=FALSE)
   };stopCluster(cl)
 
-predsub=finished_output[,c(1:2,6:7)]
+predsub=finished_output[,c(1:2,5,6)]
 
 predspread=pivot_wider(data=predsub,id_cols=sample_name,names_from=modelname,values_from=c("t_mean","t_std"))
 predunlist=as.data.frame(unnest(predspread))
 colnames(predunlist)=sub(".csv", "", colnames(predunlist))
 write.csv(predunlist,"SpectralPredictR_trait_output.csv",row.names=FALSE)
+
