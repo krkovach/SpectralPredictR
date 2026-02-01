@@ -109,6 +109,9 @@ if (j=="asd") {
 }
 if (j=="sig") {
   FSTjc = apply_jump_correction(FST, instrument="SVC")
+}
+if (j=="sed") {
+  FSTjc = FST
 };FSTdf=FSTjc
     if (!exists('FFO')){FFO=FSTdf[0,]}
     FFO=rbind(FFO,FSTdf)
@@ -177,4 +180,5 @@ predspread=pivot_wider(data=predsub,id_cols=sample_name,names_from=modelname,val
 predunlist=as.data.frame(unnest(predspread))
 colnames(predunlist)=sub(".csv", "", colnames(predunlist))
 write.csv(predunlist,"SpectralPredictR_trait_output.csv",row.names=FALSE)
+
 
